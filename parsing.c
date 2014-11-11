@@ -30,6 +30,30 @@ lval lval_err(int x) {
     return v;
 }
 
+void lval_print(lval v) {
+    switch(v.type) {
+        case LVAL_NUM:
+            printf("%li", v.num);
+            break;
+        case LVAL_ERR:
+            if (v.err == LERR_DIV_ZERO) {
+                printf("Error: Division By Zero!");
+            } else if (v.err == LERR_BAD_OP) {
+                printf("Error: Invalid Operator!");
+            } else if (v.err == LERR_BAD_NUM) {
+                printf("Error: Invalid Number!");
+            } else {
+                printf("Error: Unknown error");
+            }
+            break;
+    }
+}
+
+void lval_println(lval v) {
+    lval_print(v);
+    putchar('\n');
+}
+
 int number_of_nodes(mpc_ast_t* t) {
   if (t->children_num == 0) {
     return 1;
