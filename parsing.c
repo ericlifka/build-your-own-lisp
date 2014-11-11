@@ -47,6 +47,31 @@ lval* lval_sexpr(void) {
     return v;
 }
 
+void lval_del(lval* v) {
+    switch(v->type) {
+        
+    case LVAL_NUM:
+        break; // No extra memory allocated for numbers
+
+    case LVAL_ERR:
+        free(v->err);
+        break;
+
+    case LVAL_SYM:
+        free(v->sym);
+        break;
+
+    case LVAL_SEXPR:
+        for (int i = 0; i < v->count; i++) {
+            lval_del(v->cell[i]);
+        }
+        free(v->cell);
+        break;
+    }
+
+    free(v);
+}
+
 void lval_print(lval v) {
     switch(v.type) {
 
