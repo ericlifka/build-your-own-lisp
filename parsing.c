@@ -10,6 +10,12 @@ typedef struct {
     int err;
 } lval;
 
+/* Possible lval types */
+enum { LVAL_NUM, LVAL_ERR };
+
+/* Possible Error conditions */
+enum { LERR_DIV_ZERO, LERR_BAD_OP, LERR_BAD_NUM };
+
 int number_of_nodes(mpc_ast_t* t) {
   if (t->children_num == 0) {
     return 1;
