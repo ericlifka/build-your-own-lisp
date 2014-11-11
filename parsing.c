@@ -26,8 +26,8 @@ lval* lval_num(long x) {
 lval* lval_err(char* msg) {
     lval* v = malloc(sizeof(lval));
     v->type = LVAL_ERR;
-    v->err = malloc(strlen(m) + 1);
-    strcpy(v->err, m);
+    v->err = malloc(strlen(msg) + 1);
+    strcpy(v->err, msg);
     return v;
 }
 
@@ -72,32 +72,32 @@ void lval_del(lval* v) {
     free(v);
 }
 
-void lval_print(lval v) {
-    switch(v.type) {
+// void lval_print(lval v) {
+//     switch(v.type) {
+//
+//     case LVAL_NUM:
+//         printf("%li", v.num);
+//         break;
+//
+//     case LVAL_ERR:
+//         if (v.err == LERR_DIV_ZERO) {
+//             printf("Error: Division By Zero!");
+//         } else if (v.err == LERR_BAD_OP) {
+//             printf("Error: Invalid Operator!");
+//         } else if (v.err == LERR_BAD_NUM) {
+//             printf("Error: Invalid Number!");
+//         } else {
+//             printf("Error: Unknown error");
+//         }
+//         break;
+//
+//     }
+// }
 
-    case LVAL_NUM:
-        printf("%li", v.num);
-        break;
-
-    case LVAL_ERR:
-        if (v.err == LERR_DIV_ZERO) {
-            printf("Error: Division By Zero!");
-        } else if (v.err == LERR_BAD_OP) {
-            printf("Error: Invalid Operator!");
-        } else if (v.err == LERR_BAD_NUM) {
-            printf("Error: Invalid Number!");
-        } else {
-            printf("Error: Unknown error");
-        }
-        break;
-
-    }
-}
-
-void lval_println(lval v) {
-    lval_print(v);
-    putchar('\n');
-}
+// void lval_println(lval v) {
+//     lval_print(v);
+//     putchar('\n');
+// }
 
 lval* lval_read_num(mpc_ast_t* t) {
     errno = 0;
@@ -119,7 +119,7 @@ lval* lval_read(mpc_ast_t* t) {
 
     // If root or sexpr then start a new empty list
     lval* x = NULL;
-    if (strcmp(t->tag, ">")) == 0) { x = lval_sexpr(); }
+    if (strcmp(t->tag, ">") == 0) { x = lval_sexpr(); }
     if (strstr(t->tag, "sexpr")) { x = lval_sexpr(); }
 
     // Fill list with any valid expression contained within
@@ -135,47 +135,47 @@ lval* lval_read(mpc_ast_t* t) {
     return x;
 }
 
-lval eval_op(lval x, char* op, lval y) {
-    if (x.type == LVAL_ERR) return x;
-    if (y.type == LVAL_ERR) return y;
-
-    if (strcmp(op, "+") == 0) return lval_num(x.num + y.num);
-    if (strcmp(op, "-") == 0) return lval_num(x.num - y.num);
-    if (strcmp(op, "*") == 0) return lval_num(x.num * y.num);
-    if (strcmp(op, "/") == 0) {
-        if (y.num == 0) {
-            return lval_err(LERR_DIV_ZERO);
-        } else {
-            return lval_num(x.num / y.num);
-        }
-    }
-
-    return lval_err(LERR_BAD_OP);
-}
-
-lval eval(mpc_ast_t* t) {
-    if (strstr(t->tag, "number")) {
-        errno = 0;
-        long x = strtol(t->contents, NULL, 10);
-        if (errno == ERANGE) {
-            return lval_err(LERR_BAD_NUM);
-        } else {
-            return lval_num(x);
-        }
-    }
-
-    // Get the operator from the second position
-    char* op = t->children[1]->contents;
-    lval x = eval(t->children[2]);
-
-    int i = 3;
-    while (strstr(t->children[i]->tag, "expr")) {
-        x = eval_op(x, op, eval(t->children[i]));
-        i++;
-    }
-
-    return x;
-}
+// lval eval_op(lval x, char* op, lval y) {
+//     if (x.type == LVAL_ERR) return x;
+//     if (y.type == LVAL_ERR) return y;
+//
+//     if (strcmp(op, "+") == 0) return lval_num(x.num + y.num);
+//     if (strcmp(op, "-") == 0) return lval_num(x.num - y.num);
+//     if (strcmp(op, "*") == 0) return lval_num(x.num * y.num);
+//     if (strcmp(op, "/") == 0) {
+//         if (y.num == 0) {
+//             return lval_err(LERR_DIV_ZERO);
+//         } else {
+//             return lval_num(x.num / y.num);
+//         }
+//     }
+//
+//     return lval_err(LERR_BAD_OP);
+// }
+//
+// lval eval(mpc_ast_t* t) {
+//     if (strstr(t->tag, "number")) {
+//         errno = 0;
+//         long x = strtol(t->contents, NULL, 10);
+//         if (errno == ERANGE) {
+//             return lval_err(LERR_BAD_NUM);
+//         } else {
+//             return lval_num(x);
+//         }
+//     }
+//
+//     // Get the operator from the second position
+//     char* op = t->children[1]->contents;
+//     lval x = eval(t->children[2]);
+//
+//     int i = 3;
+//     while (strstr(t->children[i]->tag, "expr")) {
+//         x = eval_op(x, op, eval(t->children[i]));
+//         i++;
+//     }
+//
+//     return x;
+// }
 
 void lval_print(lval* v);
 
