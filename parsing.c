@@ -3,6 +3,13 @@
 #include <editline/readline.h>
 #include "mpc.h"
 
+/* lval's represent result values */
+typedef struct {
+    int type;
+    long num;
+    int err;
+} lval;
+
 int number_of_nodes(mpc_ast_t* t) {
   if (t->children_num == 0) {
     return 1;
