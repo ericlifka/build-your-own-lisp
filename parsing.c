@@ -32,20 +32,23 @@ lval lval_err(int x) {
 
 void lval_print(lval v) {
     switch(v.type) {
-        case LVAL_NUM:
-            printf("%li", v.num);
-            break;
-        case LVAL_ERR:
-            if (v.err == LERR_DIV_ZERO) {
-                printf("Error: Division By Zero!");
-            } else if (v.err == LERR_BAD_OP) {
-                printf("Error: Invalid Operator!");
-            } else if (v.err == LERR_BAD_NUM) {
-                printf("Error: Invalid Number!");
-            } else {
-                printf("Error: Unknown error");
-            }
-            break;
+
+    case LVAL_NUM:
+        printf("%li", v.num);
+        break;
+
+    case LVAL_ERR:
+        if (v.err == LERR_DIV_ZERO) {
+            printf("Error: Division By Zero!");
+        } else if (v.err == LERR_BAD_OP) {
+            printf("Error: Invalid Operator!");
+        } else if (v.err == LERR_BAD_NUM) {
+            printf("Error: Invalid Number!");
+        } else {
+            printf("Error: Unknown error");
+        }
+        break;
+
     }
 }
 
@@ -67,12 +70,22 @@ int number_of_nodes(mpc_ast_t* t) {
   }
 }
 
-long eval_op(long x, char* op, long y) {
-  if (strcmp(op, "+") == 0) return x + y;
-  if (strcmp(op, "-") == 0) return x - y;
-  if (strcmp(op, "*") == 0) return x * y;
-  if (strcmp(op, "/") == 0) return x / y;
-  return 0;
+lval eval_op(lval x, char* op, lval y) {
+    if (x.type == LVAL_ERROR) return x;
+    if (y.type == LVAL_ERR) return y;
+
+    if (strcmp(op, "+") == 0) return lval_num(x.num + y.num);
+    if (strcmp(op, "-") == 0) return lval_num(x.num - y.num);
+    if (strcmp(op, "*") == 0) return lval_num(x.num * y.num);
+    if (strcmp(op, "/") == 0) {
+        if (y.num == 0) {
+            return lval_err(LERR_DIV_ZERO);
+        } else {
+            return lval_num(x.num / y.num);
+        }
+    }
+
+    return lval_err(LERR_BAD_OP);
 }
 
 long eval(mpc_ast_t* t) {
