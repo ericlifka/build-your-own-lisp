@@ -88,23 +88,28 @@ lval eval_op(lval x, char* op, lval y) {
     return lval_err(LERR_BAD_OP);
 }
 
-long eval(mpc_ast_t* t) {
-  if (strstr(t->tag, "number")) {
-    return atoi(t->contents);
-  }
+lval eval(mpc_ast_t* t) {
+    if (strstr(t->tag, "number")) {
+        errno = 0;
+        long x = strtol(t->contents, NULL, 10);
+        if (errno == ERANGE) {
+            return lval_err(LERR_BAD_NUM);
+        } else {
+            return lval_num(x);
+        }
+    }
 
-  // Get the operator from the second position
-  char* op = t->children[1]->contents;
+    // Get the operator from the second position
+    char* op = t->children[1]->contents;
+    lval x = eval(t->children[2]);
 
-  long x = eval(t->children[2]);
+    int i = 3;
+    while (strstr(t->children[i]->tag, "expr")) {
+        x = eval_op(x, op, eval(t->children[i]));
+        i++;
+    }
 
-  int i = 3;
-  while (strstr(t->children[i]->tag, "expr")) {
-    x = eval_op(x, op, eval(t->children[i]));
-    i++;
-  }
-
-  return x;
+    return x;
 }
 
 int main(int argc, char** argv) {
