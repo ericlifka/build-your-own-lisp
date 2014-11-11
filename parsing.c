@@ -177,6 +177,46 @@ lval eval(mpc_ast_t* t) {
     return x;
 }
 
+void lval_print(lval* v);
+
+void lval_expr_print(lval* v, char open, char close) {
+    putchar(open);
+    for (int i = 0; i < v->count; i++) {
+        lval_print(v->cell[i]);
+        if (i != (v->count-1)) {
+            putchar(' ');
+        }
+    }
+    putchar(close);
+}
+
+void lval_print(lval* v) {
+    switch(v->type) {
+
+    case LVAL_NUM:
+        printf("%li", v->num);
+        break;
+
+    case LVAL_ERR:
+        printf("Error: %s", v->err);
+        break;
+
+    case LVAL_SYM:
+        printf("%s", v->sym);
+        break;
+
+    case LVAL_SEXPR:
+        lval_expr_print(v, '(', ')');
+        break;
+
+    }
+}
+
+void lval_println(lval* v) {
+    lval_print(v);
+    putchar('\n');
+}
+
 int main(int argc, char** argv) {
     mpc_parser_t* Number = mpc_new("number");
     mpc_parser_t* Symbol = mpc_new("symbol");
@@ -203,8 +243,9 @@ int main(int argc, char** argv) {
 
         mpc_result_t r;
         if (mpc_parse("<stdin>", input, Lispy, &r)) {
-            lval result = eval(r.output);
-            lval_println(result);
+            lval* x = lval_read(r.output);
+            lval_println(x);
+            lval_del(x);
             mpc_ast_delete(r.output);
         }
         else {
