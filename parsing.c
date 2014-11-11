@@ -72,33 +72,6 @@ void lval_del(lval* v) {
     free(v);
 }
 
-// void lval_print(lval v) {
-//     switch(v.type) {
-//
-//     case LVAL_NUM:
-//         printf("%li", v.num);
-//         break;
-//
-//     case LVAL_ERR:
-//         if (v.err == LERR_DIV_ZERO) {
-//             printf("Error: Division By Zero!");
-//         } else if (v.err == LERR_BAD_OP) {
-//             printf("Error: Invalid Operator!");
-//         } else if (v.err == LERR_BAD_NUM) {
-//             printf("Error: Invalid Number!");
-//         } else {
-//             printf("Error: Unknown error");
-//         }
-//         break;
-//
-//     }
-// }
-
-// void lval_println(lval v) {
-//     lval_print(v);
-//     putchar('\n');
-// }
-
 lval* lval_read_num(mpc_ast_t* t) {
     errno = 0;
     long x = strtol(t->contents, NULL, 10);
