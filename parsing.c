@@ -167,6 +167,46 @@ lval* lval_take(lval* v, int i) {
     return x;
 }
 
+lval* builtin_op(lval* a, char* op) {
+    // Check for non numeric inputs
+    for (int i = 0; i < a->count; i++) {
+        if (a->cell[i]->type != LVAL_NUM) {
+            lval_del(a);
+            return lval_err("Cannot operate on a non-number!");
+        }
+    }
+
+    lval* x = lval_pop(a, 0);
+
+    // Check for unary negation, which is a specially handled case
+    if ((strcmp(op, "-") == 0) && a->count == 0) {
+        x->num = -x->num;
+    }
+
+    while (a->count > 0) {
+        lval* y = lval_pop(a, 0);
+
+        if (strcmp(op, "+") == 0) { x->num += y->num; }
+        if (strcmp(op, "-") == 0) { x->num -= y->num; }
+        if (strcmp(op, "*") == 0) { x->num *= y->num; }
+        if (strcmp(op, "/") == 0) {
+            if (y->num == 0) {
+                lval_del(x);
+                lval_del(y);
+                lval_del(a);
+                return lval_err("Division By Zero!");
+            }
+
+            x->num /= y->num;
+        }
+
+        lval_del(y);
+    }
+
+    lval_del(a);
+    return x;
+}
+
 lval* lval_eval(lval* v);
 lval* lval_eval_sexpr(lval* v) {
     /* Evaluate all children first so that we can act on a
