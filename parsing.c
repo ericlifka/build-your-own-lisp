@@ -148,9 +148,26 @@ void lval_println(lval* v) {
     putchar('\n');
 }
 
+lval* lval_pop(lval* v, int i) {
+    lval* x = v->cell[i];
+
+    // Shift memory after the popped item over by one
+    memmove(&v->cell[i], &v->cell[i+1],
+        sizeof(lval*) * (v->count - i - 1));
+
+    v->count--;
+
+    v->cell = realloc(v->cell, sizeof(lval*) * v->count);
+    return x;
+}
+
+lval* lval_take(lval* v, int i) {
+    lval* x = lval_pop(v, i);
+    lval_del(v);
+    return x;
+}
+
 lval* lval_eval(lval* v);
-lval* lval_pop(lval* v, int i);
-lval* lval_take(lval* v, int i);
 lval* lval_eval_sexpr(lval* v) {
     /* Evaluate all children first so that we can act on a
        flat list of values
