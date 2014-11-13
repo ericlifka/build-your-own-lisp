@@ -148,6 +148,58 @@ void lval_println(lval* v) {
     putchar('\n');
 }
 
+lval* lval_eval(lval* v);
+lval* lval_pop(lval* v, int i);
+lval* lval_take(lval* v, int i);
+lval* lval_eval_sexpr(lval* v) {
+    /* Evaluate all children first so that we can act on a
+       flat list of values
+    */
+    for (int i = 0; i < v->count; i++) {
+        v->cell[i] = lval_eval(v->cell[i]);
+    }
+
+    // If any children are errors then the whole expression is an error
+    for (int i = 0; i < v->count; i++) {
+        if (v->cell[i]->type == LVAL_ERR) {
+            return lval_take(v, i);
+        }
+    }
+
+    // The empty expression resolves to itself
+    if (v->count == 0) {
+        return v;
+    }
+
+    // A list of only one value resolves to that value: (1) -> 1
+    if (v->count == 1) {
+        return lval_take(v, 0);
+    }
+
+    // First element of an expression must be a Symbol
+    lval* f = lval_pop(v, 0);
+    if (f->type != LVAL_SYM) {
+        lval_del(f);
+        lval_del(v);
+        return lval_err("S-expression Does not start with symbol!");
+    }
+
+    // Evaluate the vetted S-expression
+    lval* result = builtin_op(v, f->sym);
+    lval_del(f);
+
+    return result;
+}
+
+lval* lval_eval(lval* v) {
+    // If the value passed is an s-expression it must be passed through the resolver
+    if (v->type == LVAL_SEXPR) {
+        return lval_eval_sexpr(v);
+    } else {
+        return v;
+    }
+}
+
 int main(int argc, char** argv) {
     mpc_parser_t* Number = mpc_new("number");
     mpc_parser_t* Symbol = mpc_new("symbol");
