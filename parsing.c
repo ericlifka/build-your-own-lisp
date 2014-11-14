@@ -262,6 +262,29 @@ lval* builtin_eval(lval* a) {
     return lval_eval(x);
 }
 
+lval* lval_join(lval* x, lval* y) {
+    while (y->count) {
+        x = lval_add(x, lval_pop(y, 0));
+    }
+
+    lval_del(y);
+    return x;
+}
+
+lval* builtin_join(lval* a) {
+    for (int i = 0; i < a->count; i++) {
+        LASSERT(a, a->cell[i]->type == LVAL_QEXPR, "Function 'join' passed incorrect type.");
+    }
+
+    lval* x = lval_pop(a, 0);
+    while (a->count) {
+        x = lval_join(x, lval_pop(a, 0));
+    }
+
+    lval_del(a);
+    return x;
+}
+
 lval* lval_eval(lval* v);
 lval* lval_eval_sexpr(lval* v) {
     /* Evaluate all children first so that we can act on a
