@@ -19,6 +19,8 @@ typedef struct lval {
 /* Possible lval types */
 enum { LVAL_ERR, LVAL_NUM, LVAL_SYM, LVAL_SEXPR, LVAL_QEXPR };
 
+lval* lval_eval(lval* v);
+
 lval* lval_num(long x) {
     lval* v = malloc(sizeof(lval));
     v->type = LVAL_NUM;
@@ -285,7 +287,17 @@ lval* builtin_join(lval* a) {
     return x;
 }
 
-lval* lval_eval(lval* v);
+lval* builtin(lval* a, char* func) {
+    if (strcmp("list", func) == 0) { return builtin_list(a); }
+    if (strcmp("head", func) == 0) { return builtin_head(a); }
+    if (strcmp("tail", func) == 0) { return builtin_tail(a); }
+    if (strcmp("join", func) == 0) { return builtin_join(a); }
+    if (strcmp("eval", func) == 0) { return builtin_eval(a); }
+    if (strstr("+-/*", func)) { return builtin_op(a, func); }
+    lval_del(a);
+    return lval_err("Unknown Function!");
+}
+
 lval* lval_eval_sexpr(lval* v) {
     /* Evaluate all children first so that we can act on a
        flat list of values
@@ -320,7 +332,7 @@ lval* lval_eval_sexpr(lval* v) {
     }
 
     // Evaluate the vetted S-expression
-    lval* result = builtin_op(v, f->sym);
+    lval* result = builtin(v, f->sym);
     lval_del(f);
 
     return result;
