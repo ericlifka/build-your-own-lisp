@@ -19,6 +19,8 @@ typedef struct lval {
 /* Possible lval types */
 enum { LVAL_ERR, LVAL_NUM, LVAL_SYM, LVAL_SEXPR, LVAL_QEXPR };
 
+typedef lval*(*lbuiltin)(lenv*, lval*);
+
 lval* lval_eval(lval* v);
 
 lval* lval_num(long x) {
