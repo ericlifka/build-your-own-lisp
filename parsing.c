@@ -6,20 +6,27 @@
 #define LASSERT(args, cond, err) \
     if (!(cond)) { lval_del(args); return lval_err(err); }
 
-/* lval's represent result values */
-typedef struct lval {
+struct lval;
+struct lenv;
+typedef struct lval lval;
+typedef struct lenv lenv;
+
+enum { LVAL_ERR, LVAL_NUM,   LVAL_SYM,
+       LVAL_FUN, LVAL_SEXPR, LVAL_QEXPR };
+
+typedef lval*(*lbuiltin)(lenv*, lval*);
+
+struct lval {
     int type;
+
     long num;
     char* err;
     char* sym;
-    struct lval** cell;
-    int count; // number of lvals in cell array
-} lval;
+    lbuiltin fun;
 
-/* Possible lval types */
-enum { LVAL_ERR, LVAL_NUM, LVAL_SYM, LVAL_SEXPR, LVAL_QEXPR };
-
-typedef lval*(*lbuiltin)(lenv*, lval*);
+    int count;
+    lval** cell;
+};
 
 lval* lval_eval(lval* v);
 
