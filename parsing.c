@@ -100,6 +100,8 @@ void lval_del(lval* v) {
 
     }
 
+    case LVAL_FUN: break;
+
     free(v);
 }
 
@@ -174,6 +176,10 @@ void lval_print(lval* v) {
 
     case LVAL_QEXPR:
         lval_expr_print(v, '{', '}');
+        break;
+
+    case LVAL_FUN:
+        printf("<function>");
         break;
 
     }
