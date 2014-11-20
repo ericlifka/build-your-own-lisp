@@ -28,6 +28,12 @@ struct lval {
     lval** cell;
 };
 
+struct lenv {
+    int count;
+    char** syms;
+    lval** vals;
+}
+
 lval* lval_eval(lval* v);
 
 lval* lval_num(long x) {
