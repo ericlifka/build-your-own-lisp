@@ -390,7 +390,7 @@ lval* builtin_eval(lenv* e, lval* a) {
 
     lval* x = lval_take(a, 0);
     x->type = LVAL_SEXPR;
-    return lval_eval(x);
+    return lval_eval(e, x);
 }
 
 lval* lval_join(lval* x, lval* y) {
@@ -523,15 +523,20 @@ int main(int argc, char** argv) {
     puts("Lispy Version 0.0.0.0.1");
     puts("Press Ctr+c to Exit\n");
 
+    lenv* e = lenv_new();
+    lenv_add_builtins(e);
+
     while (1) {
         char* input = readline("lispy> ");
         add_history(input);
 
         mpc_result_t r;
         if (mpc_parse("<stdin>", input, Lispy, &r)) {
-            lval* x = lval_eval(lval_read(r.output));
+
+            lval* x = lval_eval(e, lval_read(r.output));
             lval_println(x);
             lval_del(x);
+
             mpc_ast_delete(r.output);
         }
         else {
@@ -541,6 +546,8 @@ int main(int argc, char** argv) {
 
         free(input);
     }
+
+    lenv_del(e);
 
     mpc_cleanup(6, Number, Symbol, Sexpr, Qexpr, Expr, Lispy);
 
