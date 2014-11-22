@@ -32,9 +32,10 @@ struct lenv {
     int count;
     char** syms;
     lval** vals;
-}
+};
 
-lval* lval_eval(lval* v);
+lval* lval_eval(lenv* e, lval* v);
+lval* builtin_op(lenv* e, lval* a, char* op);
 
 lval* lval_num(long x) {
     lval* v = malloc(sizeof(lval));
@@ -104,9 +105,9 @@ void lval_del(lval* v) {
         free(v->cell);
         break;
 
-    }
-
     case LVAL_FUN: break;
+
+    }
 
     free(v);
 }
@@ -215,7 +216,7 @@ lval* lval_copy(lval* v) {
         strcpy(x->sym, v->sym);
         break;
 
-    case LVAL_SEXPR
+    case LVAL_SEXPR:
     case LVAL_QEXPR:
         x->count = v->count;
         x->cell = malloc(sizeof(lval*) * x->count);
