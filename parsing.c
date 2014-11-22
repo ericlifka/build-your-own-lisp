@@ -300,7 +300,7 @@ void lenv_put(lenv* e, lval* k, lval* v) {
     strcpy(e->syms[e->count-1], k->sym);
 }
 
-lval* builtin_op(lval* a, char* op) {
+lval* builtin_op(lenv* e, lval* a, char* op) {
     // Check for non numeric inputs
     for (int i = 0; i < a->count; i++) {
         if (a->cell[i]->type != LVAL_NUM) {
@@ -340,7 +340,7 @@ lval* builtin_op(lval* a, char* op) {
     return x;
 }
 
-lval* builtin_head(lval* a) {
+lval* builtin_head(lenv* e, lval* a) {
     LASSERT(a, a->count == 1, "Function 'head' accepts exactly one argument");
     LASSERT(a, a->cell[0]->type == LVAL_QEXPR, "Function 'head' passed incorrect types!");
     LASSERT(a, a->cell[0]->count != 0, "Function 'head' passed {}!");
@@ -353,7 +353,7 @@ lval* builtin_head(lval* a) {
     return v;
 }
 
-lval* builtin_tail(lval* a) {
+lval* builtin_tail(lenv* e, lval* a) {
     LASSERT(a, a->count == 1, "Function 'tail' passed too many arguments!");
     LASSERT(a, a->cell[0]->type == LVAL_QEXPR, "Function 'tail' passed incorrect types!");
     LASSERT(a, a->cell[0]->count != 0, "Function 'tail' passed {}!");
@@ -363,12 +363,12 @@ lval* builtin_tail(lval* a) {
     return v;
 }
 
-lval* builtin_list(lval* a) {
+lval* builtin_list(lenv* e, lval* a) {
     a->type = LVAL_QEXPR;
     return a;
 }
 
-lval* builtin_eval(lval* a) {
+lval* builtin_eval(lenv* e, lval* a) {
     LASSERT(a, a->count == 1, "Function 'eval' passed too many arguments");
     LASSERT(a, a->cell[0]->type == LVAL_QEXPR, "Function 'eval' passed incorrect type");
 
@@ -386,7 +386,7 @@ lval* lval_join(lval* x, lval* y) {
     return x;
 }
 
-lval* builtin_join(lval* a) {
+lval* builtin_join(lenv* e, lval* a) {
     for (int i = 0; i < a->count; i++) {
         LASSERT(a, a->cell[i]->type == LVAL_QEXPR, "Function 'join' passed incorrect type.");
     }
@@ -400,13 +400,13 @@ lval* builtin_join(lval* a) {
     return x;
 }
 
-lval* builtin(lval* a, char* func) {
-    if (strcmp("list", func) == 0) { return builtin_list(a); }
-    if (strcmp("head", func) == 0) { return builtin_head(a); }
-    if (strcmp("tail", func) == 0) { return builtin_tail(a); }
-    if (strcmp("join", func) == 0) { return builtin_join(a); }
-    if (strcmp("eval", func) == 0) { return builtin_eval(a); }
-    if (strstr("+-/*", func)) { return builtin_op(a, func); }
+lval* builtin(lenv* e, lval* a, char* func) {
+    if (strcmp("list", func) == 0) { return builtin_list(e, a); }
+    if (strcmp("head", func) == 0) { return builtin_head(e, a); }
+    if (strcmp("tail", func) == 0) { return builtin_tail(e, a); }
+    if (strcmp("join", func) == 0) { return builtin_join(e, a); }
+    if (strcmp("eval", func) == 0) { return builtin_eval(e, a); }
+    if (strstr("+-/*", func)) { return builtin_op(e, a, func); }
     lval_del(a);
     return lval_err("Unknown Function!");
 }
@@ -447,7 +447,7 @@ lval* lval_eval_sexpr(lenv* e, lval* v) {
     // Call the function to get result
     lval * result = f->fun(e, v);
     lval_del(f);
-    
+
     return result;
 }
 
