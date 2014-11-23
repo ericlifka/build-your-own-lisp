@@ -393,7 +393,9 @@ lval* builtin_op(lenv* e, lval* a, char* op) {
 }
 
 lval* builtin_head(lenv* e, lval* a) {
-    LASSERT(a, a->count == 1, "Function 'head' accepts exactly one argument");
+    LASSERT(a, a->count == 1,
+        "Function 'head' passed too many arguments. Got %i, Expected %i.",
+        a->count, 1);
     LASSERT(a, a->cell[0]->type == LVAL_QEXPR, "Function 'head' passed incorrect types!");
     LASSERT(a, a->cell[0]->count != 0, "Function 'head' passed {}!");
 
