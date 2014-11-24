@@ -110,7 +110,7 @@ lval* lval_qexpr(void) {
 lval* lval_fun(lbuiltin func) {
     lval* v = malloc(sizeof(lval));
     v->type = LVAL_FUN;
-    v->fun = func;
+    v->lbuiltin = func;
     return v;
 }
 
@@ -230,7 +230,7 @@ lval* lval_copy(lval* v) {
     switch (v->type) {
 
     case LVAL_FUN:
-        x->fun = v->fun;
+        x->lbuiltin = v->lbuiltin;
         break;
 
     case LVAL_NUM:
@@ -530,7 +530,7 @@ lval* lval_eval_sexpr(lenv* e, lval* v) {
     }
 
     // Call the function to get result
-    lval * result = f->fun(e, v);
+    lval * result = f->lbuiltin(e, v);
     lval_del(f);
 
     return result;
