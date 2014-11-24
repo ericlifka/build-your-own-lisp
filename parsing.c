@@ -644,7 +644,6 @@ lval* lval_eval_sexpr(lenv* e, lval* v) {
     // Call the function to get result
     lval * result = lval_call(e, f, v);
     lval_del(f);
-    lval_del(v);
 
     return result;
 }
@@ -712,6 +711,7 @@ void lenv_add_builtin(lenv* e, char* name, lbuiltin func) {
 }
 
 void lenv_add_builtins(lenv* e) {
+    lenv_add_builtin(e, "\\", builtin_lambda);
     lenv_add_builtin(e, "def", builtin_def);
     lenv_add_builtin(e, "=", builtin_put);
     lenv_add_builtin(e, "list", builtin_list);
