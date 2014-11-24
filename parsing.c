@@ -114,6 +114,17 @@ lval* lval_fun(lbuiltin func) {
     return v;
 }
 
+lval* lval_lambda(lval* formals, lval* body) {
+    lval* v = malloc(sizeof(lval));
+    v->type = LVAL_FUN;
+
+    v->builtin = NULL;
+    v->env = lenv_new();
+    v->formals = formals;
+    v->body = body;
+    return v;
+}
+
 void lval_del(lval* v) {
     switch(v->type) {
 
