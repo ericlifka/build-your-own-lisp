@@ -397,6 +397,13 @@ void lenv_put(lenv* e, lval* k, lval* v) {
     strcpy(e->syms[e->count-1], k->sym);
 }
 
+void lenv_def(lenv* e, lval* k, lval* v) {
+    while (e->par) {
+        e = e->par;
+    }
+    lenv_put(e, k, v);
+}
+
 lval* builtin_def(lenv* e, lval* a) {
     LASSERT(a, a->cell[0]->type == LVAL_QEXPR,
         "Function 'def' passed incorrect type!");
