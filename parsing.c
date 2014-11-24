@@ -234,7 +234,15 @@ void lval_print(lval* v) {
         break;
 
     case LVAL_FUN:
-        printf("<function>");
+        if (v->builtin) {
+            printf("<function>");
+        } else {
+            printf("(\\ ");
+            lval_print(v->formals);
+            putchar(' ');
+            lval_print(v->body);
+            putchar(')');
+        }
         break;
 
     }
