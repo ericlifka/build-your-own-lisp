@@ -60,6 +60,10 @@ struct lenv {
 
 lval* lval_eval(lenv* e, lval* v);
 lval* builtin_op(lenv* e, lval* a, char* op);
+lenv* lenv_new(void);
+void lenv_del(lenv* e);
+lenv* lenv_copy(lenv* e);
+lval* lval_call(lenv* e, lval* f, lval* a);
 
 char* ltype_name(int t) {
     switch(t) {
@@ -123,7 +127,7 @@ lval* lval_qexpr(void) {
 lval* lval_fun(lbuiltin func) {
     lval* v = malloc(sizeof(lval));
     v->type = LVAL_FUN;
-    v->lbuiltin = func;
+    v->builtin = func;
     return v;
 }
 
@@ -364,12 +368,14 @@ void lenv_del(lenv* e) {
 }
 
 lval* lenv_get(lenv* e, lval* k) {
+
     for (int i = 0; i < e->count; i++) {
         if (strcmp(e->syms[i], k->sym) == 0) {
             return lval_copy(e->vals[i]);
         }
     }
 
+    /* If no symbol check in parent otherwise error */
     if (e->par) {
         return lenv_get(e->par, k);
     } else {
