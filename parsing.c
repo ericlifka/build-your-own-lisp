@@ -653,6 +653,46 @@ lval* lval_eval(lenv* e, lval* v) {
     }
 }
 
+lval* lval_call(lenv* e, lval* f, lval* a) {
+    if (f->builtin) {
+        return f->builtin(e, a);
+    }
+
+    int given = a->count;
+    int total = f->formals->count;
+
+    // Bind arguments to function parameters in the execution scope
+    while (a->count) {
+        if (f->formals->count == 0) {
+            lval_del(a);
+            return lval_err(
+                "Function passed too many arguments. Got %i, Expected %i.",
+                given,
+                total);
+        }
+
+        lval* sym = lval_pop(f->formals, 0);
+
+        lval* val = lval_pop(a, 0);
+
+        lenv_put(f->env, sym, val);
+
+        lval_del(sym);
+        lval_del(val);
+    }
+    lval_del(a);
+
+    if (f->formals->count == 0) {
+        // Set environment parent to evaluation environment
+        f->env->par = e;
+        return builtin_eval(f->env,
+            lval_add(lval_sexpr(), lval_copy(f->body)));
+    } else {
+        // If not all parameters are filled then return partially evaluated function
+        return lval_copy(f);
+    }
+}
+
 void lenv_add_builtin(lenv* e, char* name, lbuiltin func) {
     lval* k = lval_sym(name);
     lval* v = lval_fun(func);
