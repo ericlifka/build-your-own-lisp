@@ -247,7 +247,14 @@ lval* lval_copy(lval* v) {
     switch (v->type) {
 
     case LVAL_FUN:
-        x->lbuiltin = v->lbuiltin;
+        if (v->builtin) {
+            x->builtin = v->builtin;
+        } else {
+            x->builtin = NULL;
+            x->env = lenv_copy(v->env);
+            x->formals = lval_copy(v->formals);
+            x->body = lval_copy(v->body);
+        }
         break;
 
     case LVAL_NUM:
