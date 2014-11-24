@@ -147,7 +147,13 @@ void lval_del(lval* v) {
         free(v->cell);
         break;
 
-    case LVAL_FUN: break;
+    case LVAL_FUN:
+        if (!v->builtin) {
+            lenv_del(v->env);
+            lval_del(v->formals);
+            lval_del(v->body);
+        }
+        break;
 
     }
 
