@@ -52,6 +52,7 @@ struct lval {
 };
 
 struct lenv {
+    lenv* par;
     int count;
     char** syms;
     lval** vals;
@@ -331,6 +332,7 @@ lval* lval_take(lval* v, int i) {
 
 lenv* lenv_new(void) {
     lenv* e = malloc(sizeof(lenv));
+    e->par = NULL;
     e->count = 0;
     e->syms = NULL;
     e->vals = NULL;
