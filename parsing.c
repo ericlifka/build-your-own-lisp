@@ -77,15 +77,31 @@ char* ltype_name(int t) {
     }
 }
 
-lval* lval_num(long x) {
+lval* empty_lval(void) {
     lval* v = malloc(sizeof(lval));
+    v->type = -1;
+    v->num = 0;
+    v->err = NULL;
+    v->sym = NULL;
+    v->builtin = NULL;
+    v->env = NULL;
+    v->formals = NULL;
+    v->body = NULL;
+    v->count = 0;
+    v->cell = NULL;
+
+    return v;
+}
+
+lval* lval_num(long x) {
+    lval* v = empty_lval();
     v->type = LVAL_NUM;
     v->num = x;
     return v;
 }
 
 lval* lval_err(char* fmt, ...) {
-    lval* v = malloc(sizeof(lval));
+    lval* v = empty_lval();
     v->type = LVAL_ERR;
 
     va_list va;
@@ -101,7 +117,7 @@ lval* lval_err(char* fmt, ...) {
 }
 
 lval* lval_sym(char* s) {
-    lval* v = malloc(sizeof(lval));
+    lval* v = empty_lval();
     v->type = LVAL_SYM;
     v->sym = malloc(strlen(s) + 1);
     strcpy(v->sym, s);
@@ -109,7 +125,7 @@ lval* lval_sym(char* s) {
 }
 
 lval* lval_sexpr(void) {
-    lval* v = malloc(sizeof(lval));
+    lval* v = empty_lval();
     v->type = LVAL_SEXPR;
     v->count = 0;
     v->cell = NULL;
@@ -117,7 +133,7 @@ lval* lval_sexpr(void) {
 }
 
 lval* lval_qexpr(void) {
-    lval* v = malloc(sizeof(lval));
+    lval* v = empty_lval();
     v->type = LVAL_QEXPR;
     v->count = 0;
     v->cell = NULL;
@@ -125,14 +141,14 @@ lval* lval_qexpr(void) {
 }
 
 lval* lval_fun(lbuiltin func) {
-    lval* v = malloc(sizeof(lval));
+    lval* v = empty_lval();
     v->type = LVAL_FUN;
     v->builtin = func;
     return v;
 }
 
 lval* lval_lambda(lval* formals, lval* body) {
-    lval* v = malloc(sizeof(lval));
+    lval* v = empty_lval();
     v->type = LVAL_FUN;
 
     v->builtin = NULL;
@@ -143,6 +159,10 @@ lval* lval_lambda(lval* formals, lval* body) {
 }
 
 void lval_del(lval* v) {
+    if (v != NULL) {
+        return;
+    }
+
     switch(v->type) {
 
     case LVAL_NUM:
@@ -644,6 +664,7 @@ lval* lval_eval_sexpr(lenv* e, lval* v) {
     // Call the function to get result
     lval * result = lval_call(e, f, v);
     lval_del(f);
+    lval_del(v);
 
     return result;
 }
