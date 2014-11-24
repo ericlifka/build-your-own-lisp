@@ -627,14 +627,18 @@ lval* lval_eval_sexpr(lenv* e, lval* v) {
     // Ensure first element is a function after evaluation
     lval* f = lval_pop(v, 0);
     if (f->type != LVAL_FUN) {
+        lval* err = lval_err(
+            "S-Expression starts with incorrect type. Got %s, Expected %s.",
+            ltype_name(f->type), ltype_name(LVAL_FUN));
         lval_del(f);
         lval_del(v);
-        return lval_err("first element is not a function");
+        return err;
     }
 
     // Call the function to get result
-    lval * result = f->lbuiltin(e, v);
+    lval * result = lval_call(e, f, v);
     lval_del(f);
+    lval_del(v);
 
     return result;
 }
