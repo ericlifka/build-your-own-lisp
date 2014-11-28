@@ -27,7 +27,7 @@ struct lenv;
 typedef struct lval lval;
 typedef struct lenv lenv;
 
-enum { LVAL_ERR, LVAL_NUM,   LVAL_SYM,
+enum { LVAL_ERR, LVAL_NUM,   LVAL_SYM,  LVAL_STR,
        LVAL_FUN, LVAL_SEXPR, LVAL_QEXPR };
 
 typedef lval*(*lbuiltin)(lenv*, lval*);
@@ -39,6 +39,7 @@ struct lval {
     long num;
     char* err;
     char* sym;
+    char* str;
 
     // Function types
     lbuiltin builtin;
@@ -121,6 +122,14 @@ lval* lval_sym(char* s) {
     v->type = LVAL_SYM;
     v->sym = malloc(strlen(s) + 1);
     strcpy(v->sym, s);
+    return v;
+}
+
+lval* lval_str(char* s) {
+    lval* v = malloc(sizeof(lval));
+    v->type = LVAL_STR;
+    v->str = malloc(strlen(s) + 1);
+    strcpy(v->str, s);
     return v;
 }
 
