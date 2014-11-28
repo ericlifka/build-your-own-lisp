@@ -65,6 +65,7 @@ lenv* lenv_new(void);
 void lenv_del(lenv* e);
 lenv* lenv_copy(lenv* e);
 lval* lval_call(lenv* e, lval* f, lval* a);
+lval* lval_read_str(mpc_ast_t* t);
 
 char* ltype_name(int t) {
     switch(t) {
@@ -220,7 +221,7 @@ lval* lval_read_num(mpc_ast_t* t) {
         lval_num(x) : lval_err("invalid number");
 }
 
-lval* lval_read_string(mpc_ast_t* t) {
+lval* lval_read_str(mpc_ast_t* t) {
     // truncate last character to remove trailing quotes
     t->contents[strlen(t->contents)-1] = '\0';
     // Copy the string missing out the first quote character
