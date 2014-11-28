@@ -220,6 +220,21 @@ lval* lval_read_num(mpc_ast_t* t) {
         lval_num(x) : lval_err("invalid number");
 }
 
+lval* lval_read_string(mpc_ast_t* t) {
+    // truncate last character to remove trailing quotes
+    t->contents[strlen(t->contents)-1] = '\0';
+    // Copy the string missing out the first quote character
+    char* unescaped = malloc(strlen(t->contents + 1) + 1);
+    strcpy(unescaped, t->contents + 1);
+    // replace escaped characters with their counterparts
+    unescaped = mpcf_unescape(unescaped);
+
+    lval* str = lval_str(unescaped);
+    free(unescaped);
+
+    return str;
+}
+
 lval* lval_add(lval* v, lval* x) {
     v->count++;
     v->cell = realloc(v->cell, sizeof(lval*) * v->count);
@@ -230,6 +245,7 @@ lval* lval_add(lval* v, lval* x) {
 lval* lval_read(mpc_ast_t* t) {
     if (strstr(t->tag, "number")) return lval_read_num(t);
     if (strstr(t->tag, "symbol")) return lval_sym(t->contents);
+    if (strstr(t->tag, "string")) return lval_read_str(t);
 
     // If root or sexpr then start a new empty list
     lval* x = NULL;
@@ -947,6 +963,7 @@ int main(int argc, char** argv) {
       "                                                        \
         number : /-?[0-9]+/ ;                                  \
         symbol : /[a-zA-Z0-9_+\\-*\\/\\\\=<>!&]+/ ;            \
+        string : /\"(\\\\.|[^\"])*\"/ ;                        \
         sexpr  : '(' <expr>* ')' ;                             \
         qexpr  : '{' <expr>* '}' ;                             \
         expr   : <number> | <symbol> | <sexpr> | <qexpr> ;     \
