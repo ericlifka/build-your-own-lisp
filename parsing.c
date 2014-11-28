@@ -68,13 +68,16 @@ lval* lval_call(lenv* e, lval* f, lval* a);
 
 char* ltype_name(int t) {
     switch(t) {
-        case LVAL_FUN: return "Function";
-        case LVAL_NUM: return "Number";
-        case LVAL_ERR: return "Error";
-        case LVAL_SYM: return "Symbol";
-        case LVAL_SEXPR: return "S-Expression";
-        case LVAL_QEXPR: return "Q-Expression";
-        default: return "Unknown";
+
+    case LVAL_FUN: return "Function";
+    case LVAL_NUM: return "Number";
+    case LVAL_ERR: return "Error";
+    case LVAL_SYM: return "Symbol";
+    case LVAL_STR: return "String";
+    case LVAL_SEXPR: return "S-Expression";
+    case LVAL_QEXPR: return "Q-Expression";
+    default: return "Unknown";
+
     }
 }
 
@@ -183,6 +186,10 @@ void lval_del(lval* v) {
 
     case LVAL_SYM:
         free(v->sym);
+        break;
+
+    case LVAL_STR:
+        free(v->str);
         break;
 
     case LVAL_SEXPR:
@@ -323,6 +330,11 @@ lval* lval_copy(lval* v) {
     case LVAL_SYM:
         x->sym = malloc(strlen(v->sym) + 1);
         strcpy(x->sym, v->sym);
+        break;
+
+    case LVAL_STR:
+        x->str = malloc(strlen(v->str) + 1);
+        strcpy(x->str, v->str);
         break;
 
     case LVAL_SEXPR:
@@ -667,6 +679,7 @@ int lval_eq(lval* x, lval* y) {
 
     case LVAL_ERR: return (strcmp(x->err, y->err) == 0);
     case LVAL_SYM: return (strcmp(x->sym, y->sym) == 0);
+    case LVAL_STR: return (strcmp(x->str, y->str) == 0);
 
     case LVAL_FUN:
         if (x->builtin || y->builtin) {
