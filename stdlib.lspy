@@ -71,4 +71,18 @@
             {true}
             {elem x (tail l)}}})
 
+(fun {map fn li}
+    {if (== li nil)
+        {nil}
+        {join (list (fn (fst li)))
+            (map fn (tail li))}})
+
+(fun {filter fn li}
+    {if (== li nil)
+        {nil}
+        {join
+            (if (fn (fst li))
+                {head li}
+                {nil})
+            (filter fn (tail li))}})
             
