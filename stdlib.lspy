@@ -12,3 +12,11 @@
 
 (def {curry} unpack)
 (def {uncurry} pack)
+
+(fun {do & li}
+    {if (== li nil)
+        {nil}
+        {last li}})
+
+(fun {let b}
+    {((\ {_} b) ())})
