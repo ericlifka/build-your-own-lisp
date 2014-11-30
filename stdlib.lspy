@@ -24,3 +24,7 @@
 (fun {not x} {- 1 x})
 (fun {or x y} {+ x y})
 (fun {and x y} {* x y})
+
+(fun {flip f a b} {f b a})
+(fun {ghost & xs} {eval xs})
+(fun {comp f g x} {f (g x)})
