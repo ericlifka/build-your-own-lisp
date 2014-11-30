@@ -28,3 +28,12 @@
 (fun {flip f a b} {f b a})
 (fun {ghost & xs} {eval xs})
 (fun {comp f g x} {f (g x)})
+
+(fun {fst li}
+    {eval (head li)})
+
+(fun {snd li}
+    {eval (head (tail li))})
+
+(fun {trd li}
+    {eval (head (tail (tail l)))})
