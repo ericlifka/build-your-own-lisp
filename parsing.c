@@ -535,6 +535,16 @@ lval* builtin_print(lenv* e, lval* a) {
     return lval_sexpr();
 }
 
+lval* builtin_error(lenv* e, lval* a) {
+    LASSERT_NUM("error", a, 1);
+    LASSERT_TYPE("error", a, 0, LVAL_STR);
+
+    lval* err = lval_err(a->cell[0]->str);
+
+    lval_del(a);
+    return err;
+}
+
 lval* builtin_var(lenv* e, lval* a, char* func) {
     LASSERT_TYPE(func, a, 0, LVAL_QEXPR);
     lval* syms = a->cell[0];
@@ -996,6 +1006,7 @@ void lenv_add_builtins(lenv* e) {
     lenv_add_builtin(e, "join", builtin_join);
     lenv_add_builtin(e, "load", builtin_load);
     lenv_add_builtin(e, "print", builtin_print);
+    lenv_add_builtin(e, "error", builtin_error);
     lenv_add_builtin(e, "+", builtin_add);
     lenv_add_builtin(e, "-", builtin_sub);
     lenv_add_builtin(e, "*", builtin_mul);
