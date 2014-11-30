@@ -37,3 +37,16 @@
 
 (fun {trd li}
     {eval (head (tail (tail l)))})
+
+(fun {len li}
+    {if (== li nil)
+        {0}
+        {+ 1 (len (tail li))}})
+
+(fun {nth n li}
+    {if (== n 0)
+        {fst li}
+        {nth (- n 1) (tail li)}})
+
+(fun {last li}
+    {nth (- (len li) 1) li})
