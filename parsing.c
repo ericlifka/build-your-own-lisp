@@ -523,6 +523,18 @@ lval* builtin_load(lenv* e, lval* a) {
     }
 }
 
+lval* builtin_print(lenv* e, lval* a) {
+    for (int i = 0; i < a->count; i++) {
+        lval_print(a->cell[i]);
+        putchar(' ');
+    }
+
+    putchar('\n');
+    lval_del(a);
+
+    return lval_sexpr();
+}
+
 lval* builtin_var(lenv* e, lval* a, char* func) {
     LASSERT_TYPE(func, a, 0, LVAL_QEXPR);
     lval* syms = a->cell[0];
@@ -983,6 +995,7 @@ void lenv_add_builtins(lenv* e) {
     lenv_add_builtin(e, "eval", builtin_eval);
     lenv_add_builtin(e, "join", builtin_join);
     lenv_add_builtin(e, "load", builtin_load);
+    lenv_add_builtin(e, "print", builtin_print);
     lenv_add_builtin(e, "+", builtin_add);
     lenv_add_builtin(e, "-", builtin_sub);
     lenv_add_builtin(e, "*", builtin_mul);
