@@ -85,4 +85,11 @@
                 {head li}
                 {nil})
             (filter fn (tail li))}})
-            
+
+(fun {foldl f z l}
+    {if (== l nil)
+        {z}
+        {foldl f (f z (fst l)) (tail l)}})
+
+(fun {sum l} {foldl + 0 l})
+(fun {product l} {foldl * 1 l})
