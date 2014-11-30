@@ -50,3 +50,25 @@
 
 (fun {last li}
     {nth (- (len li) 1) li})
+
+(fun {take n li}
+    {if (== n 0)
+        {nil}
+        {join (head li) (take (- n 1) (tail li))}})
+
+(fun {drop n li}
+    {if (== n 0)
+        {li}
+        {drop (- n 1) (tail li)}})
+
+(fun {split n li}
+    {list (take n li) (drop n li)})
+
+(fun {elem x li}
+    {if (== li nil)
+        {false}
+        {if (== x (fst li))
+            {true}
+            {elem x (tail l)}}})
+
+            
