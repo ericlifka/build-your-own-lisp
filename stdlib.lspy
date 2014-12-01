@@ -109,3 +109,11 @@
         {if (== x (fst (fst cs)))
             {snd (fst cs)}
             {unpack case (join (list x) (tail cs))}}})
+
+(fun {fib n}
+    {select
+        {(== n 0) {0}}
+        {(== n 1) {1}}
+        {otherwise
+            {+ (fib (- n 1))
+               (fib (- n 2))}}})
